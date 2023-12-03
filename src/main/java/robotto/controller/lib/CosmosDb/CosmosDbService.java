@@ -10,8 +10,11 @@ import com.azure.cosmos.CosmosAsyncClient;
 import com.azure.cosmos.CosmosAsyncContainer;
 import com.azure.cosmos.CosmosAsyncDatabase;
 import com.azure.cosmos.CosmosClientBuilder;
+import com.azure.cosmos.models.CosmosContainerProperties;
+import com.azure.cosmos.models.CosmosContainerResponse;
 import com.azure.cosmos.models.CosmosDatabaseResponse;
 import com.azure.cosmos.models.CosmosItemRequestOptions;
+import com.azure.cosmos.models.ThroughputProperties;
 
 import reactor.core.publisher.Mono;
 import robotto.controller.lib.Models.CosmosDb.ResourceMetadata;
@@ -24,18 +27,18 @@ public class CosmosDbService {
     private CosmosAsyncDatabase database;
 
     private CosmosAsyncContainer container;
-
-    @Value("${azure.storage.cosmos.account-name}")
-    private String accountName;
-
+    
     @Value("${azure.storage.cosmos.account-key}")
     private String accountKey;
 
-    @Value("${azure.storage.cosmos-endpoint}")
+    @Value("${azure.storage.cosmos.endpoint}")
     private String cosmosEndpoint;
 
-    @Value("${azure.storage.database-name}")
+    @Value("${azure.storage.cosmos.database-name}")
     private String databaseName;
+
+    @Value("${azure.storage.cosmos.resource-container-name}")
+    private String resouceContainerName;
 
     private static Logger logger = LogManager.getLogger(CosmosDbService.class.toString());
 
@@ -47,7 +50,7 @@ public class CosmosDbService {
                 .consistencyLevel(ConsistencyLevel.SESSION)
                 .buildAsyncClient();
         createDatabaseIfNotExists();
-        //createContainerIfNotExists();
+        createContainerIfNotExists();
     }
 
     public void uploadMetadata(ResourceMetadata metadata) {
@@ -63,7 +66,7 @@ public class CosmosDbService {
                 }).subscribe();
     }
 
-    private void createDatabaseIfNotExists() {
+    private void createDatabaseIfNotExists(){
         logger.info("Create database " + databaseName + " if not exists.");
 
         //  Create database if not exists
@@ -73,5 +76,19 @@ public class CosmosDbService {
             logger.info("Checking database " + database.getId() + " completed!\n");
             return Mono.empty();
         }).block();
+    }
+
+    private void createContainerIfNotExists(){
+        logger.info("Create container {} if not exists.", resouceContainerName);
+
+        CosmosContainerProperties containerProperties =
+                new CosmosContainerProperties(resouceContainerName, "/missionId");
+
+        // Provision throughput
+        ThroughputProperties throughputProperties = ThroughputProperties.createManualThroughput(400);
+
+        //  Create container with 200 RU/s
+        CosmosContainerResponse containerResponse = database.createContainerIfNotExists(containerProperties, throughputProperties).block();
+        container = database.getContainer(containerResponse.getProperties().getId());
     }
 }
