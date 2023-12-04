@@ -17,6 +17,7 @@ import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.ThroughputProperties;
 
 import reactor.core.publisher.Mono;
+import robotto.controller.lib.Models.CosmosDb.Mission;
 import robotto.controller.lib.Models.CosmosDb.ResourceMetadata;
 
 @Service
@@ -26,7 +27,9 @@ public class CosmosDbService {
 
     private CosmosAsyncDatabase database;
 
-    private CosmosAsyncContainer container;
+    private CosmosAsyncContainer resourceContainer;
+
+    private CosmosAsyncContainer missionContainer;
     
     @Value("${azure.storage.cosmos.account-key}")
     private String accountKey;
@@ -38,7 +41,10 @@ public class CosmosDbService {
     private String databaseName;
 
     @Value("${azure.storage.cosmos.resource-container-name}")
-    private String resouceContainerName;
+    private String resourceContainerName;
+
+    @Value("${azure.storage.cosmos.mission-container-name}")
+    private String missionContainerName;
 
     private static Logger logger = LogManager.getLogger(CosmosDbService.class.toString());
 
@@ -54,9 +60,22 @@ public class CosmosDbService {
     }
 
     public void uploadMetadata(ResourceMetadata metadata) {
-        container.createItem(metadata, new CosmosItemRequestOptions())
+        resourceContainer.createItem(metadata, new CosmosItemRequestOptions())
                 .doOnSuccess((response) -> {
-                    logger.info("inserted doc with id: {}", response.getItem().getID());
+                    logger.info("inserted doc with id: {} to {}", response.getItem().getID(), resourceContainerName);
+                })
+                .doOnError((exception) -> {
+                    logger.error(
+                            "Exception. e: {}",
+                            exception.getLocalizedMessage(),
+                            exception);
+                }).subscribe();
+    }
+
+    public void createMission(Mission mission) {
+        missionContainer.createItem(mission, new CosmosItemRequestOptions())
+                .doOnSuccess((response) -> {
+                    logger.info("inserted doc with id: {} to {}", response.getItem().getID(), missionContainerName);
                 })
                 .doOnError((exception) -> {
                     logger.error(
@@ -79,16 +98,19 @@ public class CosmosDbService {
     }
 
     private void createContainerIfNotExists(){
-        logger.info("Create container {} if not exists.", resouceContainerName);
+        logger.info("Create container {} if not exists.", resourceContainerName);
 
-        CosmosContainerProperties containerProperties =
-                new CosmosContainerProperties(resouceContainerName, "/missionId");
+        CosmosContainerProperties resourceContainerProperties =
+                new CosmosContainerProperties(resourceContainerName, "/missionId");
 
+        CosmosContainerProperties missionContainerProperties =
+                new CosmosContainerProperties(missionContainerName, "/ID");
         // Provision throughput
         ThroughputProperties throughputProperties = ThroughputProperties.createManualThroughput(400);
 
         //  Create container with 200 RU/s
-        CosmosContainerResponse containerResponse = database.createContainerIfNotExists(containerProperties, throughputProperties).block();
-        container = database.getContainer(containerResponse.getProperties().getId());
+        database.createContainerIfNotExists(resourceContainerProperties, throughputProperties).block();
+        database.createContainerIfNotExists(missionContainerProperties, throughputProperties).block();
+        
     }
 }

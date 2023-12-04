@@ -10,6 +10,7 @@ import robotto.controller.lib.CosmosDb.CosmosDbService;
 import robotto.controller.lib.EventStream.EventPublisher;
 import robotto.controller.lib.Models.BlobStorage.Resource;
 import robotto.controller.lib.Models.CosmosDb.ResourceMetadata;
+import robotto.controller.lib.Models.CosmosDb.Mission;
 import robotto.controller.lib.Models.Events.DroneTelemetry;
 
 @Service
@@ -42,8 +43,8 @@ public class DataIntegrationController {
         eventPublisher.publishTelemetry(telemetry);
    }
 
-   //boolean createMission(MissionData data){
-
-   //}
+   void createMission(Mission mission){
+        cosmosService.createMission(mission);
+   }
 
 }
