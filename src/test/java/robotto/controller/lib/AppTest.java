@@ -17,19 +17,8 @@ import static org.junit.Assert.assertNotNull;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@RunWith(SpringRunner.class)
-@SpringBootTest
 public class AppTest 
 {
-
-    @Autowired
-    private EventPublisher eventPublisher;
-
-    // Context loading test - a simple test that the application context loads successfully
-    @Test
-    public void contextLoads() {
-        assertNotNull(eventPublisher);
-    }
 
     @Autowired
     private EventPublisher eventPublisher;
