@@ -22,21 +22,21 @@ public class DataIntegrationController {
    @Autowired
    BlobStorageService blobService;
 
-   @Autowired
-   CosmosDbService cosmosService;
+//    @Autowired
+//    CosmosDbService cosmosService;
 
    void uploadResource(Resource resource){
-        try {
-          String resourceUri = blobService.uploadBlob(resource); 
-          ResourceMetadata metadata = new ResourceMetadata();
-          metadata.setMissionId(resource.getMissionId());
-          metadata.setBlobStorageUri(resourceUri);
-          metadata.setType(resource.getType());
-          metadata.setRaw(resource.isRaw());
-          cosmosService.uploadMetadata(metadata);
-        } catch (IOException e) {
+     //    try {
+     //      String resourceUri = blobService.uploadBlob(resource); 
+     //      ResourceMetadata metadata = new ResourceMetadata();
+     //      metadata.setMissionId(resource.getMissionId());
+     //      metadata.setBlobStorageUri(resourceUri);
+     //      metadata.setType(resource.getType());
+     //      metadata.setRaw(resource.isRaw());
+     //      cosmosService.uploadMetadata(metadata);
+     //    } catch (IOException e) {
           
-        }
+     //    }
    }
 
    void publishTelemetryEvent(DroneTelemetry telemetry){
@@ -44,7 +44,7 @@ public class DataIntegrationController {
    }
 
    void createMission(Mission mission){
-        cosmosService.createMission(mission);
+     //    cosmosService.createMission(mission);
    }
 
 }

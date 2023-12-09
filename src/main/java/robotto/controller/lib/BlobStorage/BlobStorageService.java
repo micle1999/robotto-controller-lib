@@ -17,7 +17,7 @@ public class BlobStorageService {
     @Value("${azure.storage.blob-endpoint}")
     private String blobEndpoint;
 
-    @Value("${azure.storage.blob-connection-string}")
+    @Value("${azure.storage.blob.connection-string}")
     private String connectionString;
 
     private static Logger logger = LogManager.getLogger(BlobStorageService.class.toString());

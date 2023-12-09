@@ -68,7 +68,7 @@ public class StreamServiceConfig {
     }
 
     @Bean
-    public AmqpTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+    public AmqpTemplate template(ConnectionFactory connectionFactory) {
         final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setDefaultReceiveQueue(queueName);
         rabbitTemplate.setMessageConverter(jsonMessageConverter());
@@ -78,7 +78,7 @@ public class StreamServiceConfig {
         return rabbitTemplate;
     }
     @Bean
-    public AmqpAdmin amqpAdmin() {
+    public AmqpAdmin admin() {
         return new RabbitAdmin(connectionFactory());
     }
     @Bean
