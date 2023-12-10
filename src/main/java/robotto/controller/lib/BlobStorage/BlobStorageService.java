@@ -4,27 +4,29 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 
 import robotto.controller.lib.Utils;
 import robotto.controller.lib.Models.BlobStorage.Resource;
+import org.springframework.context.annotation.*;
 
+@Configuration
 @Service
 public class BlobStorageService {
 
-    @Value("${azure.storage.blob-endpoint}")
-    private String blobEndpoint;
+    @Value("${azure.storage.blob.endpoint}")
+    private String endpoint;
 
     @Value("${azure.storage.blob.connection-string}")
     private String connectionString;
 
     private static Logger logger = LogManager.getLogger(BlobStorageService.class.toString());
 
-
     public String uploadBlob(Resource resource) throws IOException{
-        String connectionString = String.format(blobEndpoint);
+        String connectionString = String.format(endpoint);
 
         BlobServiceClient blobServiceClient = new BlobServiceClientBuilder().connectionString(connectionString).buildClient();
         
@@ -33,7 +35,7 @@ public class BlobStorageService {
         String container = Utils.getContainerName(resource.getType(), resource.getMissionId());
         String resourceId = Utils.generateID(resource.getMissionId(), resource.getData().getOriginalFilename());
         blobServiceClient.getBlobContainerClient(container).getBlobClient(resourceId).upload(resource.getData().getInputStream());
-        return String.format("%s/%s/%s", blobEndpoint, container, resourceId);
+        return String.format("%s/%s/%s", endpoint, container, resourceId);
     }
 
 }
