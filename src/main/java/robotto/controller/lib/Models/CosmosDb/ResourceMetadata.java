@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import robotto.controller.lib.Models.BlobStorage.Resource;
+
 import java.io.Serializable;
 import java.rmi.server.UID;
 import java.time.LocalDateTime;
@@ -32,6 +34,14 @@ public class ResourceMetadata implements Serializable {
 
     @JsonProperty
     private boolean raw;
+
+    public ResourceMetadata(Resource resource, String uri) {
+        super();
+        missionId = resource.getMissionId();
+        blobStorageUri = uri;
+        type = resource.getType();
+        raw = resource.isRaw();
+    }
 
     @Override
     public String toString() {

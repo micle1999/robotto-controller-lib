@@ -49,14 +49,14 @@ public class CosmosDbService {
     private static Logger logger = LogManager.getLogger(CosmosDbService.class.toString());
 
     public CosmosDbService(){
-        // this.client = new CosmosClientBuilder()
-        //         .endpoint(cosmosEndpoint)
-        //         .key(accountKey)
-        //         .contentResponseOnWriteEnabled(true)
-        //         .consistencyLevel(ConsistencyLevel.SESSION)
-        //         .buildAsyncClient();
-        // createDatabaseIfNotExists();
-        // createContainerIfNotExists();
+        this.client = new CosmosClientBuilder()
+                .endpoint(cosmosEndpoint)
+                .key(accountKey)
+                .contentResponseOnWriteEnabled(true)
+                .consistencyLevel(ConsistencyLevel.SESSION)
+                .buildAsyncClient();
+        createDatabaseIfNotExists();
+        createContainerIfNotExists();
     }
 
     public void uploadMetadata(ResourceMetadata metadata) {
